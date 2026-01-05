@@ -28,8 +28,8 @@ func Execute(cfg *Config) error {
 			}
 
 			// TODO: simulate streaming
-			if f, ok := keys[ch]; ok {
-				go play(f, cfg.Audio.SampleRate, cfg.Audio.Duration, cfg.Audio.Channels)
+			if freq, ok := keys[ch]; ok {
+				go play(freq, cfg)
 			}
 		}
 	})
@@ -38,19 +38,19 @@ func Execute(cfg *Config) error {
 	return nil
 }
 
-func play(freq float64, sr int, dur float64, channels int) {
+func play(freq float64, cfg *Config) {
 	// TODO: move into separate Player struct
 	f, _ := os.CreateTemp("", "note*.wav")
 	defer os.Remove(f.Name())
 	defer f.Close()
 
 	// TODO: cache all notes from available keys (keys config first)
-	w := audio.NewWAV(sr, channels)
-	w.AddTone(freq, dur)
+	w := audio.NewWAV(cfg.Audio.SampleRate, cfg.Audio.Channels)
+	w.AddTone(freq, cfg.Audio.Duration)
 	w.WriteFull(f)
 
-	// TODO: use config file to specify which command to use (default: afplay - MacOS)
-	exec.Command("afplay", f.Name()).Run()
+	args := append([]string{f.Name()}, cfg.Output.Args...)
+	exec.Command(cfg.Output.Command, args...).Run()
 }
 
 func setupKeys(cfg *Config) map[byte]float64 {

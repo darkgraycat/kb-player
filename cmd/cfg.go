@@ -8,7 +8,10 @@ type Config struct {
 		Channels   int     `toml:"channels"`
 		Duration   float64 `toml:"duration"`
 	} `toml:"audio"`
-
+	Output struct {
+		Command string
+		Args    []string
+	} `toml:"output"`
 	Keys map[string]int `toml:"keys"`
 }
 
