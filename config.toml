@@ -1,0 +1,30 @@
+[audio]
+sample_rate = 44100
+channels = 1
+duration = 0.25
+
+[keys]
+# octave 3
+z = 0  # C3
+x = 2  # D3
+c = 4  # E3
+v = 5  # F3
+b = 7  # G3
+n = 9  # A3
+m = 11 # B3
+# octave 4
+a = 12 # C4
+s = 14 # D4
+d = 16 # E4
+f = 17 # F4
+g = 19 # G4
+h = 21 # A4
+j = 23 # B4
+# octave 5
+q = 24 # C5
+w = 26 # D5
+e = 28 # E5
+r = 29 # F5
+t = 31 # G5
+y = 33 # A5
+u = 35 # B5
