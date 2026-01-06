@@ -6,7 +6,7 @@ const C3Freq = 130.81
 
 const (
 	// Octave 3
-	NoteC3 = iota
+	NoteC3 int = iota
 	NoteCs3
 	NoteD3
 	NoteDs3

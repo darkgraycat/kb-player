@@ -4,12 +4,19 @@ import (
 	"kbplayer/internal/audio"
 	"kbplayer/internal/tui"
 	"os"
-	"os/exec"
 )
 
 func Execute(cfg *Config) error {
 	keys := setupKeys(cfg)
 	// TODO: next setup synth
+	quitCh := cfg.Keymap.Quit[0]
+
+	var output audio.Output
+	if cfg.Output.Mode == "stream" {
+		output = audio.NewStreamOutput(cfg.Output.Command, cfg.Output.Args...)
+	} else {
+		output = audio.NewFileOutput(cfg.Output.Command, cfg.Output.Args...)
+	}
 
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
 		buf := make([]byte, 1)
@@ -23,13 +30,19 @@ func Execute(cfg *Config) error {
 			ch := buf[0]
 
 			switch ch {
-			case 'Q':
+			case quitCh:
 				return nil, nil
 			}
 
 			// TODO: simulate streaming
 			if freq, ok := keys[ch]; ok {
-				go play(freq, cfg)
+				go play(
+					freq,
+					cfg.Audio.Duration,
+					cfg.Audio.SampleRate,
+					cfg.Audio.Channels,
+					output,
+				)
 			}
 		}
 	})
@@ -38,24 +51,16 @@ func Execute(cfg *Config) error {
 	return nil
 }
 
-func play(freq float64, cfg *Config) {
-	// TODO: move into separate Player struct
-	f, _ := os.CreateTemp("", "note*.wav")
-	defer os.Remove(f.Name())
-	defer f.Close()
-
+func play(freq, dur float64, sr, ch int, o audio.Output) error {
 	// TODO: cache all notes from available keys (keys config first)
-	w := audio.NewWAV(cfg.Audio.SampleRate, cfg.Audio.Channels)
-	w.AddTone(freq, cfg.Audio.Duration)
-	w.WriteFull(f)
-
-	args := append([]string{f.Name()}, cfg.Output.Args...)
-	exec.Command(cfg.Output.Command, args...).Run()
+	w := audio.NewWAV(sr, ch)
+	w.AddTone(freq, dur)
+	return o.Play(w)
 }
 
 func setupKeys(cfg *Config) map[byte]float64 {
-	keys := make(map[byte]float64, len(cfg.Keys))
-	for key, code := range cfg.Keys {
+	keys := make(map[byte]float64, len(cfg.Notes))
+	for key, code := range cfg.Notes {
 		keys[key[0]] = audio.NoteFreq(code)
 	}
 	return keys

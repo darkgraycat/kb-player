@@ -9,10 +9,14 @@ type Config struct {
 		Duration   float64 `toml:"duration"`
 	} `toml:"audio"`
 	Output struct {
+		Mode    string
 		Command string
 		Args    []string
 	} `toml:"output"`
-	Keys map[string]int `toml:"keys"`
+	Notes  map[string]int `toml:"notes"`
+	Keymap struct {
+		Quit string `toml:"quit"`
+	} `toml:"keymap"`
 }
 
 func LoadConfig(path string) (*Config, error) {
