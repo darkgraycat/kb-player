@@ -35,4 +35,4 @@ y = 33 # A5
 u = 35 # B5
 
 [keymap]
-quit = "Q" # quit application in raw term mode
+quit = 3 # Ctrl-C code

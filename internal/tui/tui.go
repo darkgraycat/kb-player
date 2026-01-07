@@ -57,8 +57,8 @@ func Render() {
 		DrawTitle("Keymap", 0)
 	separator := " " + string(BorderV) + " "
 	keymap.AddContent(
-		"Q - to quit",
 		// TODO: made dynamic (depends on configs)
+		"0 - to quit",
 		"a - C"+separator+"s - D",
 		"d - E"+separator+"f - F",
 		"g - G"+separator+"h - A",

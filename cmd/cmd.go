@@ -9,7 +9,6 @@ import (
 func Execute(cfg *Config) error {
 	keys := setupKeys(cfg)
 	// TODO: next setup synth
-	quitCh := cfg.Keymap.Quit[0]
 
 	var output audio.Output
 	if cfg.Output.Mode == "stream" {
@@ -30,7 +29,7 @@ func Execute(cfg *Config) error {
 			ch := buf[0]
 
 			switch ch {
-			case quitCh:
+			case byte(cfg.Keymap.Quit):
 				return nil, nil
 			}
 
@@ -65,3 +64,4 @@ func setupKeys(cfg *Config) map[byte]float64 {
 	}
 	return keys
 }
+
