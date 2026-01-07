@@ -3,6 +3,7 @@ package audio
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"math"
 )
@@ -39,15 +40,21 @@ func (wav *WAV) AddTone(freq, dur float64) {
 
 	step := 2 * math.Pi * freq / sr
 	amp := 30000.0
+
 	phase := 0.0
+	attackStep := 1.0 / float64(attack)
+	releaseStep := 1.0 / float64(release)
 
 	for i := range numSamples {
 		env := 1.0
+
 		if i < attack {
-			env = float64(i) / float64(attack)
+			env = attackStep * float64(i)
 		} else if i >= numSamples-release {
-			env = float64(numSamples-i) / float64(release)
+			env = releaseStep * float64(numSamples-i)
 		}
+
+		fmt.Printf("I: %d, ENV: %f\r\n", i, env)
 		wav.Samples[start+i] = int16(math.Sin(phase) * amp * env)
 		phase += step
 	}
