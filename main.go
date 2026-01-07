@@ -8,10 +8,15 @@ import (
 
 var defaultConfigPath = "config.toml"
 
-// TODO: incude CLI arguments to override default config path
 func main() {
+	configPath := defaultConfigPath
 
-	cfg, err := cmd.LoadConfig(defaultConfigPath)
+	args := os.Args
+	if len(args) > 1 {
+		configPath = args[1]
+	}
+
+	cfg, err := cmd.LoadConfig(configPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error loading config")
 		fmt.Fprintln(os.Stderr, err)
