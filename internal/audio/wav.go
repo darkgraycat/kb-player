@@ -3,7 +3,6 @@ package audio
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"math"
 )
