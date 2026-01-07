@@ -7,7 +7,7 @@ import (
 )
 
 func Execute(cfg *Config) error {
-	keys := setupKeys(cfg)
+	notes := setupNotes(cfg)
 	// TODO: next setup synth
 
 	var output audio.Output
@@ -17,6 +17,28 @@ func Execute(cfg *Config) error {
 		output = audio.NewFileOutput(cfg.Output.Command, cfg.Output.Args...)
 	}
 
+	playbackLoop(output, cfg, notes)
+
+	tui.ClearScreen()
+	return nil
+}
+
+func play(freq, dur float64, sr, ch int, o audio.Output) error {
+	// TODO: cache all notes from available keys (keys config first)
+	w := audio.NewWAV(sr, ch)
+	w.AddTone(freq, dur)
+	return o.Play(w)
+}
+
+func setupNotes(cfg *Config) map[byte]float64 {
+	notes := make(map[byte]float64, len(cfg.Notes))
+	for key, code := range cfg.Notes {
+		notes[key[0]] = audio.NoteFreq(code)
+	}
+	return notes
+}
+
+func playbackLoop(output audio.Output, cfg *Config, notes map[byte]float64) {
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
 		buf := make([]byte, 1)
 
@@ -33,8 +55,9 @@ func Execute(cfg *Config) error {
 				return nil, nil
 			}
 
+			// TODO: add echo support - keep note playing till next
 			// TODO: simulate streaming
-			if freq, ok := keys[ch]; ok {
+			if freq, ok := notes[ch]; ok {
 				go play(
 					freq,
 					cfg.Audio.Duration,
@@ -45,23 +68,4 @@ func Execute(cfg *Config) error {
 			}
 		}
 	})
-
-	tui.ClearScreen()
-	return nil
 }
-
-func play(freq, dur float64, sr, ch int, o audio.Output) error {
-	// TODO: cache all notes from available keys (keys config first)
-	w := audio.NewWAV(sr, ch)
-	w.AddTone(freq, dur)
-	return o.Play(w)
-}
-
-func setupKeys(cfg *Config) map[byte]float64 {
-	keys := make(map[byte]float64, len(cfg.Notes))
-	for key, code := range cfg.Notes {
-		keys[key[0]] = audio.NoteFreq(code)
-	}
-	return keys
-}
-
