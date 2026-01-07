@@ -38,10 +38,11 @@ func (wav *WAV) AddTone(freq, dur float64) {
 	start := len(wav.Samples)
 	wav.Samples = append(wav.Samples, make([]int16, numSamples)...)
 
-	step := 2 * math.Pi * freq / sr
 	amp := 30000.0
 
 	phase := 0.0
+	step := 2 * math.Pi * freq / sr
+
 	attackStep := 1.0 / float64(attack)
 	releaseStep := 1.0 / float64(release)
 
@@ -54,7 +55,6 @@ func (wav *WAV) AddTone(freq, dur float64) {
 			env = releaseStep * float64(numSamples-i)
 		}
 
-		fmt.Printf("I: %d, ENV: %f\r\n", i, env)
 		wav.Samples[start+i] = int16(math.Sin(phase) * amp * env)
 		phase += step
 	}
