@@ -16,7 +16,7 @@ func Execute(cfg *Config) error {
 		output = audio.NewFileOutput(cfg.Output.Command, cfg.Output.Args...)
 	}
 
-	notes := setupNotes(cfg)
+	wavMap := setupWavMap(cfg)
 
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
 		buf := make([]byte, 1)
@@ -25,12 +25,13 @@ func Execute(cfg *Config) error {
 			if _, err := os.Stdin.Read(buf); err != nil {
 				return nil, err
 			}
-			switch buf[0] {
+			ch := buf[0]
+			switch ch {
 			case byte(cfg.Keymap.Quit):
 				return nil, nil
 			}
 
-			if wav, ok := notes[buf[0]]; ok {
+			if wav, ok := wavMap[ch]; ok {
 				go output.Play(wav)
 			}
 
@@ -41,7 +42,7 @@ func Execute(cfg *Config) error {
 	return nil
 }
 
-func setupNotes(cfg *Config) map[byte]*audio.WAV {
+func setupWavMap(cfg *Config) map[byte]*audio.WAV {
 	notes := make(map[byte]*audio.WAV, len(cfg.Notes))
 	for key, code := range cfg.Notes {
 		w := audio.NewWAV(cfg.Audio.SampleRate, cfg.Audio.Channels)
