@@ -7,6 +7,8 @@ import (
 	"math"
 )
 
+const AMP = 30000.0
+
 type WAV struct {
 	SampleRate int
 	Channels   int
@@ -31,16 +33,14 @@ func (wav *WAV) AddTone(freq, dur float64) {
 	sr := float64(wav.SampleRate)
 	numSamples := int(sr * dur)
 
-	attack := int(sr * 0.01)
-	release := int(sr * 0.02)
-
 	start := len(wav.Samples)
-	wav.Samples = append(wav.Samples, make([]int16, numSamples)...)
-
-	amp := 30000.0
+	wav.AddSamples(make([]int16, numSamples))
 
 	phase := 0.0
 	step := 2 * math.Pi * freq / sr
+
+	attack := int(sr * 0.01)
+	release := int(sr * 0.02)
 
 	attackStep := 1.0 / float64(attack)
 	releaseStep := 1.0 / float64(release)
@@ -54,8 +54,48 @@ func (wav *WAV) AddTone(freq, dur float64) {
 			env = releaseStep * float64(numSamples-i)
 		}
 
-		wav.Samples[start+i] = int16(math.Sin(phase) * amp * env)
+		wav.Samples[start+i] = int16(math.Sin(phase) * env * AMP)
 		phase += step
+	}
+}
+
+func (wav *WAV) AddChord(freqs []float64, dur float64) {
+	sr := float64(wav.SampleRate)
+	numSamples := int(sr * dur)
+
+	start := len(wav.Samples)
+	wav.AddSamples(make([]int16, numSamples))
+
+	phases := make([]float64, len(freqs))
+	steps := make([]float64, len(freqs))
+	for i, freq  := range freqs {
+		steps[i] = 2 * math.Pi * freq / sr
+	}
+
+	attack := int(sr * 0.01)
+	release := int(sr * 0.02)
+
+	attackStep := 1.0 / float64(attack)
+	releaseStep := 1.0 / float64(release)
+
+	numFreqs := float64(len(freqs))
+
+	for i := range numSamples {
+		env := 1.0
+
+		if i < attack {
+			env = attackStep * float64(i)
+		} else if i >= numSamples-release {
+			env = releaseStep * float64(numSamples-i)
+		}
+
+		mixed := 0.0
+		for j := range freqs {
+			mixed += math.Sin(phases[j])
+			phases[j] += steps[j]
+		}
+
+		wav.Samples[start+i] = int16((mixed / numFreqs) * env * AMP)
 	}
 }
 
@@ -96,3 +136,4 @@ func makeWAVHeader(sr, channels, bps int) []byte {
 
 	return buf.Bytes()
 }
+

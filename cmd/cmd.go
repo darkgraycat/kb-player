@@ -18,7 +18,7 @@ const (
 func Execute(cfg *Config) error {
 	var output audio.Output
 	if cfg.Output.Mode == "stream" {
-		// output = audio.NewStreamOutput(cfg.Output.Command, cfg.Output.Args...)
+		output = audio.NewStreamOutput(cfg.Output.Command, cfg.Output.Args...)
 		panic("Stream mode is not implemented yet")
 	} else {
 		output = audio.NewFileOutput(cfg.Output.Command, cfg.Output.Args...)
