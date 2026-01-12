@@ -2,11 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"kbplayer/internal/audio"
 
 	"github.com/BurntSushi/toml"
 )
 
 type Key byte
+
+type Note int
 
 func (k *Key) UnmarshalTOML(data any) error {
 	switch v := data.(type) {
@@ -37,7 +40,7 @@ type Config struct {
 		Command string
 		Args    []string
 	} `toml:"output"`
-	Notes  map[string]int `toml:"notes"`
+	Notes  map[string]audio.Note `toml:"notes"`
 	Keymap struct {
 		Quit Key `toml:"quit"`
 	} `toml:"keymap"`

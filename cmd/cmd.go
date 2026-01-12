@@ -31,7 +31,6 @@ func Execute(cfg *Config) error {
 
 	rawModeLoop(cfg, wavChan, ctlChan)
 
-	tui.ClearScreen()
 	return nil
 }
 
@@ -57,6 +56,8 @@ func rawModeLoop(cfg *Config, wavChan chan *audio.WAV, ctlChan chan Command) {
 			}
 		}
 	})
+
+	tui.ClearScreen()
 }
 
 func audioLoop(output audio.Output, wavChan chan *audio.WAV, ctlChan chan Command) {

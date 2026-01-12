@@ -10,29 +10,29 @@ args = ["-v", "0.3"] # volume to 0.3
 
 [notes]
 # octave 3
-z = 0  # C3
-x = 2  # D3
-c = 4  # E3
-v = 5  # F3
-b = 7  # G3
-n = 9  # A3
-m = 11 # B3
+z = "C3"
+x = "D3"
+c = "E3"
+v = "F3"
+b = "G3"
+n = "A3"
+m = "B3"
 # octave 4
-a = 12 # C4
-s = 14 # D4
-d = 16 # E4
-f = 17 # F4
-g = 19 # G4
-h = 21 # A4
-j = 23 # B4
+a = "C4"
+s = "D4"
+d = "E4"
+f = "F4"
+g = "G4"
+h = "A4"
+j = "B4"
 # octave 5
-q = 24 # C5
-w = 26 # D5
-e = 28 # E5
-r = 29 # F5
-t = 31 # G5
-y = 33 # A5
-u = 35 # B5
+q = "C5"
+w = "D5"
+e = "E5"
+r = "F5"
+t = "G5"
+y = "A5"
+u = "B5"
 
 [keymap]
 quit = 3 # Ctrl-C code
