@@ -9,8 +9,6 @@ import (
 
 type Key byte
 
-type Note int
-
 func (k *Key) UnmarshalTOML(data any) error {
 	switch v := data.(type) {
 	case string:
