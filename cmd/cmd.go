@@ -83,9 +83,10 @@ func audioLoop(output audio.Output, wavChan chan *audio.WAV, ctlChan chan Comman
 
 func setupWavMap(cfg *Config) map[byte]*audio.WAV {
 	notes := make(map[byte]*audio.WAV, len(cfg.Notes))
-	for key, code := range cfg.Notes {
+	for key, note := range cfg.Notes {
 		w := audio.NewWAV(cfg.Audio.SampleRate, cfg.Audio.Channels)
-		w.AddTone(audio.NoteFreq(code), cfg.Audio.Duration)
+		// w.AddTone(audio.NoteFreq(note), cfg.Audio.Duration)
+		w.AddTone(note.Freq(), cfg.Audio.Duration)
 		notes[key[0]] = w
 	}
 	return notes
