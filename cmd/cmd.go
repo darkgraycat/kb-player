@@ -7,14 +7,6 @@ import (
 	"time"
 )
 
-type Command int
-
-const (
-	CmdStart Command = iota
-	CmdStop
-	CmdExit
-)
-
 func Execute(cfg *Config) error {
 	var output audio.Output
 	if cfg.Output.Mode == "stream" {
@@ -35,6 +27,7 @@ func Execute(cfg *Config) error {
 }
 
 func rawModeLoop(cfg *Config, wavChan chan *audio.WAV, ctlChan chan Command) {
+	cmdMap := setupCommandMap(cfg)
 	wavMap := setupWavMap(cfg)
 
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
@@ -45,9 +38,9 @@ func rawModeLoop(cfg *Config, wavChan chan *audio.WAV, ctlChan chan Command) {
 				return nil, err
 			}
 			ch := buf[0]
-			switch ch {
-			case byte(cfg.Keymap.Quit):
-				ctlChan <- CmdStop
+	
+			if cmd, ok := cmdMap[ch]; ok {
+				ctlChan <- cmd
 				return nil, nil
 			}
 
@@ -63,7 +56,7 @@ func rawModeLoop(cfg *Config, wavChan chan *audio.WAV, ctlChan chan Command) {
 func audioLoop(output audio.Output, wavChan chan *audio.WAV, ctlChan chan Command) {
 	// TODO: simulate streaming using ticker
 	// or even move it into new audio.Output implementation
-	ticker := time.NewTicker(60 * time.Millisecond)
+	ticker := time.NewTicker(120 * time.Millisecond)
 	defer ticker.Stop()
 
 	running := true
@@ -74,7 +67,7 @@ func audioLoop(output audio.Output, wavChan chan *audio.WAV, ctlChan chan Comman
 		case <-ticker.C:
 		case cmd := <-ctlChan:
 			switch cmd {
-			case CmdStop:
+			case CommandStop:
 				running = false
 			}
 		}
@@ -90,4 +83,11 @@ func setupWavMap(cfg *Config) map[byte]*audio.WAV {
 		notes[key[0]] = w
 	}
 	return notes
+}
+
+func setupCommandMap(cfg *Config) map[byte]Command {
+	return map[byte]Command {
+		byte(cfg.Keymap.Quit): CommandExit,
+		byte(cfg.Keymap.Stop): CommandStop,
+	}
 }

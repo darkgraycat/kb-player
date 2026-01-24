@@ -45,7 +45,7 @@ func (wav *WAV) AddTone(freq, dur float64) {
 	attackStep := 1.0 / float64(attack)
 	releaseStep := 1.0 / float64(release)
 
-	for i := range numSamples {
+	for i := 0; i < numSamples; i++ {
 		env := 1.0
 
 		if i < attack {
@@ -72,7 +72,7 @@ func (wav *WAV) AddChord(freqs []float64, dur float64) {
 
 	phases := make([]float64, len(freqs))
 	steps := make([]float64, len(freqs))
-	for i, freq  := range freqs {
+	for i, freq := range freqs {
 		steps[i] = 2 * math.Pi * freq / sr
 	}
 
@@ -84,7 +84,7 @@ func (wav *WAV) AddChord(freqs []float64, dur float64) {
 
 	numFreqs := float64(len(freqs))
 
-	for i := range numSamples {
+	for i := 0; i < numSamples; i++ {
 		env := 1.0
 
 		if i < attack {
@@ -140,4 +140,3 @@ func makeWAVHeader(sr, channels, bps int) []byte {
 
 	return buf.Bytes()
 }
-

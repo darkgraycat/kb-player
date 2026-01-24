@@ -1,7 +1,7 @@
 [audio]
 sample_rate = 44100  # default 44100
 channels = 1         # 1 or 2
-duration = 0.25		 # in seconds
+duration = 0.33		 # in seconds
 
 [output]
 mode = "file"		 # file or stream(not implemented yet)
@@ -36,3 +36,4 @@ u = "B5"
 
 [keymap]
 quit = 3 # Ctrl-C code
+stop = "p"

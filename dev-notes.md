@@ -21,3 +21,8 @@ sample = amplitude * sin(2 * π * frequency * t)
 │   Normal    │ (back to regular terminal)
 │   Terminal  │
 └─────────────┘
+
+## TODO: Recording into text file
+Need a way to be able to record entered keys.
+Then the main window should "watch" the file (I think I need duplex stream here)
+Ability to play "file" on backgroud

@@ -30,7 +30,7 @@ func (o *FileOutput) Play(wav *WAV) error {
 	defer f.Close()
 
 	wav.WriteFull(f)
-	args := append([]string{f.Name()}, o.Args...)
+	args := append(o.Args, f.Name())
 
 	return exec.Command(o.Command, args...).Run()
 }
