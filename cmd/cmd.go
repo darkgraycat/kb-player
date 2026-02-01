@@ -18,6 +18,8 @@ func Execute(cfg *Config) error {
 
 	wavChan := make(chan *audio.WAV, 10)
 	ctlChan := make(chan Command, 1)
+	defer close(wavChan)
+	defer close(ctlChan)
 
 	go audioLoop(output, wavChan, ctlChan)
 
@@ -38,7 +40,7 @@ func rawModeLoop(cfg *Config, wavChan chan *audio.WAV, ctlChan chan Command) {
 				return nil, err
 			}
 			ch := buf[0]
-	
+
 			if cmd, ok := cmdMap[ch]; ok {
 				ctlChan <- cmd
 				return nil, nil
@@ -86,7 +88,7 @@ func setupWavMap(cfg *Config) map[byte]*audio.WAV {
 }
 
 func setupCommandMap(cfg *Config) map[byte]Command {
-	return map[byte]Command {
+	return map[byte]Command{
 		byte(cfg.Keymap.Quit): CommandExit,
 		byte(cfg.Keymap.Stop): CommandStop,
 	}

@@ -10,6 +10,20 @@ const (
 	CommandExit
 )
 
+// NOTE: just an example of making "converter"
+func (c Command) String() string {
+	switch c {
+	case CommandStart:
+		return "Start"
+	case CommandStop:
+		return "Stop"
+	case CommandExit:
+		return "Exit"
+	default:
+		return "Unknown"
+	}
+}
+
 type Key byte
 
 func (k *Key) UnmarshalTOML(data any) error {

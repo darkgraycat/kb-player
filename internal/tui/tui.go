@@ -26,7 +26,9 @@ const (
 	ClrReset   = 0
 )
 
+// Current terminal cursor position X
 var CursorX int = 1
+// Current terminal cursor position Y
 var CursorY int = 1
 
 // TODO: move it somewhere
@@ -58,7 +60,7 @@ func Render() {
 	separator := " " + string(BorderV) + " "
 	keymap.AddContent(
 		// TODO: made dynamic (depends on configs)
-		"0 - to quit",
+		"Ctrl+c - to quit",
 		"a - C"+separator+"s - D",
 		"d - E"+separator+"f - F",
 		"g - G"+separator+"h - A",
@@ -123,4 +125,6 @@ func DrawBorder(x, y, w, h int) {
 	fmt.Print(string(BorderBL), strings.Repeat(hor, w-2), string(BorderBR))
 }
 
-func WithColor(code int) { fmt.Printf("\033[%dm", code) }
+func WithColor(code int) {
+	fmt.Printf("\033[%dm", code)
+}

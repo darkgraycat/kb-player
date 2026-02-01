@@ -45,7 +45,7 @@ func (wav *WAV) AddTone(freq, dur float64) {
 	attackStep := 1.0 / float64(attack)
 	releaseStep := 1.0 / float64(release)
 
-	for i := 0; i < numSamples; i++ {
+	for i := range numSamples {
 		env := 1.0
 
 		if i < attack {
@@ -84,7 +84,7 @@ func (wav *WAV) AddChord(freqs []float64, dur float64) {
 
 	numFreqs := float64(len(freqs))
 
-	for i := 0; i < numSamples; i++ {
+	for i := range numSamples {
 		env := 1.0
 
 		if i < attack {

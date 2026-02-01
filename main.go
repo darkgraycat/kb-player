@@ -9,6 +9,13 @@ import (
 var defaultConfigPath = "config.toml"
 
 func main() {
+	// NOTE: just an example to exit gracefully on panic
+	defer func() {
+		if recover() != nil {
+			fmt.Println("Exit")
+		}
+	}()
+
 	configPath := defaultConfigPath
 
 	args := os.Args
