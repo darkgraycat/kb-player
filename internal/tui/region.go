@@ -33,17 +33,17 @@ func (r *Region) ClearContent() {
 }
 
 func (r *Region) DrawBorder(color int) *Region {
-	WithColor(color)
+	SetColor(color)
 	DrawBorder(r.X, r.Y, r.Width, r.Height)
-	WithColor(ClrReset)
+	SetColor(ClrReset)
 	return r
 }
 
 func (r *Region) DrawTitle(title string, color int) *Region {
 	Move(r.X+2, r.Y)
-	WithColor(color)
+	SetColor(color)
 	fmt.Printf("[%s]", title)
-	WithColor(ClrReset)
+	SetColor(ClrReset)
 	return r
 }
 
