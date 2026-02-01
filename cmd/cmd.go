@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	"context"
 	"kbplayer/internal/audio"
 	"kbplayer/internal/tui"
 	"os"
-	"time"
 )
 
 func Execute(cfg *Config) error {
@@ -17,23 +17,16 @@ func Execute(cfg *Config) error {
 	}
 
 	wavChan := make(chan *audio.WAV, 10)
-	ctlChan := make(chan Command, 1)
 	defer close(wavChan)
-	defer close(ctlChan)
 
-	go audioLoop(output, wavChan, ctlChan)
-
-	rawModeLoop(cfg, wavChan, ctlChan)
-
-	return nil
-}
-
-func rawModeLoop(cfg *Config, wavChan chan *audio.WAV, ctlChan chan Command) {
 	cmdMap := setupCommandMap(cfg)
 	wavMap := setupWavMap(cfg)
 
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
 		buf := make([]byte, 1)
+		ctx := context.Background()
+		var stopAudioLoop context.CancelFunc
+
 		tui.Render()
 		for {
 			if _, err := os.Stdin.Read(buf); err != nil {
@@ -41,37 +34,43 @@ func rawModeLoop(cfg *Config, wavChan chan *audio.WAV, ctlChan chan Command) {
 			}
 			ch := buf[0]
 
+			// handle commands
 			if cmd, ok := cmdMap[ch]; ok {
-				ctlChan <- cmd
-				return nil, nil
+				switch cmd {
+				case CommandQuit:
+					return nil, nil
+				case CommandPlay:
+					if stopAudioLoop == nil {
+						playCtx, cancel := context.WithCancel(ctx)
+						stopAudioLoop = cancel
+						go audioLoop(playCtx, output, wavChan)
+					} else {
+						stopAudioLoop()
+						stopAudioLoop = nil
+					}
+				}
 			}
 
-			if wav, ok := wavMap[ch]; ok {
-				wavChan <- wav
+			// play notes
+			if stopAudioLoop != nil {
+				if wav, ok := wavMap[ch]; ok {
+					wavChan <- wav
+				}
 			}
 		}
 	})
 
 	tui.ClearScreen()
+	return nil
 }
 
-func audioLoop(output audio.Output, wavChan chan *audio.WAV, ctlChan chan Command) {
-	// TODO: simulate streaming using ticker
-	// or even move it into new audio.Output implementation
-	ticker := time.NewTicker(120 * time.Millisecond)
-	defer ticker.Stop()
-
-	running := true
-	for running {
+func audioLoop(ctx context.Context, output audio.Output, wavChan chan *audio.WAV) {
+	for {
 		select {
 		case wav := <-wavChan:
 			go output.Play(wav)
-		case <-ticker.C:
-		case cmd := <-ctlChan:
-			switch cmd {
-			case CommandStop:
-				running = false
-			}
+		case <-ctx.Done():
+			return
 		}
 	}
 }
@@ -89,7 +88,7 @@ func setupWavMap(cfg *Config) map[byte]*audio.WAV {
 
 func setupCommandMap(cfg *Config) map[byte]Command {
 	return map[byte]Command{
-		byte(cfg.Keymap.Quit): CommandExit,
-		byte(cfg.Keymap.Stop): CommandStop,
+		byte(cfg.Keymap.Quit): CommandQuit,
+		byte(cfg.Keymap.Play): CommandPlay,
 	}
 }

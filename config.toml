@@ -36,4 +36,4 @@ u = "B5"
 
 [keymap]
 quit = 3 # Ctrl-C code
-stop = "p"
+play = "p" # play/stop

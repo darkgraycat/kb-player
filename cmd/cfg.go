@@ -20,7 +20,7 @@ type Config struct {
 	Notes  map[string]audio.Note `toml:"notes"`
 	Keymap struct {
 		Quit Key `toml:"quit"`
-		Stop Key `toml:"stop"`
+		Play Key `toml:"play"`
 	} `toml:"keymap"`
 }
 

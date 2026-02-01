@@ -5,24 +5,9 @@ import "fmt"
 type Command uint8
 
 const (
-	CommandStart Command = iota
-	CommandStop
-	CommandExit
+	CommandQuit Command = iota
+	CommandPlay
 )
-
-// NOTE: just an example of making "converter"
-func (c Command) String() string {
-	switch c {
-	case CommandStart:
-		return "Start"
-	case CommandStop:
-		return "Stop"
-	case CommandExit:
-		return "Exit"
-	default:
-		return "Unknown"
-	}
-}
 
 type Key byte
 
