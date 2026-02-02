@@ -7,13 +7,6 @@ import (
 	"os"
 )
 
-type Mode int
-
-const (
-	ModeNormal = iota
-	ModeRecord
-)
-
 func Execute(cfg *Config) error {
 	var output audio.Output
 	if cfg.Output.Mode == "stream" {
@@ -30,13 +23,15 @@ func Execute(cfg *Config) error {
 	wavMap := setupWavMap(cfg)
 
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
-		// TODO
-		// mode := ModeNormal
+		// controls
 		buf := make([]byte, 1)
 		ctx := context.Background()
 		var stopAudioLoop context.CancelFunc
 
-		tui.Render()
+		// tui
+		mode := ModeNormal
+		_, _, status := setupUiInterface(cfg, 80)
+
 		for {
 			if _, err := os.Stdin.Read(buf); err != nil {
 				return nil, err
@@ -53,10 +48,13 @@ func Execute(cfg *Config) error {
 						playCtx, cancel := context.WithCancel(ctx)
 						stopAudioLoop = cancel
 						go audioLoop(playCtx, output, wavChan)
+						mode = ModeRecord
 					} else {
 						stopAudioLoop()
 						stopAudioLoop = nil
+						mode = ModeNormal
 					}
+					status.DrawTitle(mode.String(), 0)
 				}
 			}
 
@@ -66,6 +64,8 @@ func Execute(cfg *Config) error {
 					wavChan <- wav
 				}
 			}
+
+			tui.Move(0,0) // reset cursor
 		}
 	})
 
@@ -100,3 +100,24 @@ func setupCommandMap(cfg *Config) map[byte]Command {
 		byte(cfg.Keymap.Play): CommandPlay,
 	}
 }
+
+func setupUiInterface(cfg *Config, width int) (*tui.Region, *tui.Region, *tui.Region) {
+	tui.ClearScreen()
+	title := tui.NewRegion(1, 1, width, 4).
+		DrawBorder(tui.ClrRed).
+		DrawTitle("KB Player v0.0", 0).
+		AppendLine("Sample rate: %d\tDuration: %f\tMode: %s", cfg.Audio.SampleRate, cfg.Audio.Duration, cfg.Output.Mode).
+		AppendLine("Quit: %v, Play: %v", cfg.Keymap.Quit, cfg.Keymap.Play)
+	main := tui.NewRegion(1, title.Y+title.Height, width, 16).
+		DrawBorder(tui.ClrCyan).
+		DrawTitle("Main", 0)
+	status := tui.NewRegion(1, main.Y+main.Height, width, 3).
+		DrawBorder(tui.ClrGreen).
+		DrawTitle(ModeNormal.String(), 0)
+	tui.Move(0, 0)
+	return title, main, status
+}
+
+func updateUiTitle(r *tui.Region)  {}
+func updateUiMain(r *tui.Region)   {}
+func updateUiStatus(r *tui.Region) {}
