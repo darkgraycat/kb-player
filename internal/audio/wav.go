@@ -59,10 +59,7 @@ func (wav *WAV) AddTone(freq, dur float64) {
 	}
 }
 
-// TODO: its nice "I" did it, but now I have a better idea:
-// For now every key represents a code of note (see note.go)
-// And first, its a bit confusing for user seing it in the config.toml
-// So what if, instead of codes we could have strings like "D#3"
+// TODO: add chord support
 func (wav *WAV) AddChord(freqs []float64, dur float64) {
 	sr := float64(wav.SampleRate)
 	numSamples := int(sr * dur)

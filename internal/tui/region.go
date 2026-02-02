@@ -16,7 +16,7 @@ func NewRegion(x, y, w, h int) *Region {
 	}
 }
 
-func (r *Region) AddContent(lines ...string) {
+func (r *Region) AddLine(lines ...string) {
 	for i, line := range lines {
 		if i >= r.Height {
 			break
@@ -27,7 +27,7 @@ func (r *Region) AddContent(lines ...string) {
 	}
 }
 
-func (r *Region) ClearContent() {
+func (r *Region) Clear() {
 	ClearRect(r.X+1, r.Y+1, r.Width-2, r.Height-2)
 	r.currentLine = r.Y + 1
 }

@@ -32,28 +32,26 @@ var cursorX int = 1
 var cursorY int = 1
 
 // TODO: move it somewhere
-
-// TODO: move it somewhere
 func Render() {
 	w, h := 80, 24
 	ClearScreen()
 	title := NewRegion(1, 1, w, 4).
 		DrawBorder(ClrRed).
 		DrawTitle("KB Player v0.0", 0)
-	title.AddContent(
+	title.AddLine(
 		"This is CLI application to play some tunes",
 		"Made in order to learn Golang, and just for fun",
 	)
 	main := NewRegion(1, 5, w, 16).
 		DrawBorder(ClrCyan).
 		DrawTitle("Main", 0)
-	main.AddContent("-a-s-d--g-d-s-a")
-	main.AddContent("-a-s-d--g-d-s-a")
+	main.AddLine("-a-s-d--g-d-s-a")
+	main.AddLine("-a-s-d--g-d-s-a")
 
 	status := NewRegion(1, h-3, w, 3).
 		DrawBorder(ClrYellow).
 		DrawTitle("Status", 0)
-	status.AddContent("Sample rate: 44100\tlistening for input")
+	status.AddLine("Sample rate: 44100\tlistening for input")
 
 	Move(0, 0)
 }

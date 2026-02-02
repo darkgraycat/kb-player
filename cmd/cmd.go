@@ -7,6 +7,13 @@ import (
 	"os"
 )
 
+type Mode int
+
+const (
+	ModeNormal = iota
+	ModeRecord
+)
+
 func Execute(cfg *Config) error {
 	var output audio.Output
 	if cfg.Output.Mode == "stream" {
@@ -23,6 +30,8 @@ func Execute(cfg *Config) error {
 	wavMap := setupWavMap(cfg)
 
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
+		// TODO
+		// mode := ModeNormal
 		buf := make([]byte, 1)
 		ctx := context.Background()
 		var stopAudioLoop context.CancelFunc
@@ -79,7 +88,6 @@ func setupWavMap(cfg *Config) map[byte]*audio.WAV {
 	notes := make(map[byte]*audio.WAV, len(cfg.Notes))
 	for key, note := range cfg.Notes {
 		w := audio.NewWAV(cfg.Audio.SampleRate, cfg.Audio.Channels)
-		// w.AddTone(audio.NoteFreq(note), cfg.Audio.Duration)
 		w.AddTone(note.Freq(), cfg.Audio.Duration)
 		notes[key[0]] = w
 	}
