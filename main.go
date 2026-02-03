@@ -24,6 +24,7 @@ func main() {
 	}
 
 	err = cmd.Execute(cfg)
+	// err = cmd.TestExecute(cfg)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error during execution")
 		fmt.Fprintln(os.Stderr, err)

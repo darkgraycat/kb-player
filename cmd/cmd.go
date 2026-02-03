@@ -33,10 +33,10 @@ func Execute(cfg *Config) error {
 		_, _, status := setupUiInterface(cfg, 80)
 
 		for {
-			if _, err := os.Stdin.Read(buf); err != nil {
+			ch, err := tui.ReadBuf(os.Stdin, buf)
+			if err != nil {
 				return nil, err
 			}
-			ch := buf[0]
 
 			// handle commands
 			if cmd, ok := cmdMap[ch]; ok {
@@ -65,11 +65,11 @@ func Execute(cfg *Config) error {
 				}
 			}
 
-			tui.Move(0,0) // reset cursor
+			tui.Move(0, 0) // reset cursor
 		}
 	})
 
-	tui.ClearScreen()
+	tui.Clear()
 	return nil
 }
 
@@ -102,7 +102,7 @@ func setupCommandMap(cfg *Config) map[byte]Command {
 }
 
 func setupUiInterface(cfg *Config, width int) (*tui.Region, *tui.Region, *tui.Region) {
-	tui.ClearScreen()
+	tui.Clear()
 	title := tui.NewRegion(1, 1, width, 4).
 		DrawBorder(tui.ClrRed).
 		DrawTitle("KB Player v0.0", 0).

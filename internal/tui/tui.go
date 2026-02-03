@@ -32,7 +32,7 @@ var cursorX int = 1
 var cursorY int = 1
 
 // Clears whole terminal screen
-func ClearScreen() {
+func Clear() {
 	fmt.Print("\033[H\033[2J")
 }
 
