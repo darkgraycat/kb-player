@@ -1,3 +1,4 @@
+// Note: Terminal coordinates are 1-indexed (top-left is 1,1)
 package tui
 
 import (
@@ -27,9 +28,9 @@ const (
 )
 
 // Current terminal cursor position X
-var cursorX int = 1
+var cursorX int = 0
 // Current terminal cursor position Y
-var cursorY int = 1
+var cursorY int = 0
 
 // Clears whole terminal screen
 func Clear() {

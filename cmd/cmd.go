@@ -106,8 +106,8 @@ func setupUiInterface(cfg *Config, width int) (*tui.Region, *tui.Region, *tui.Re
 	title := tui.NewRegion(1, 1, width, 4).
 		DrawBorder(tui.ClrRed).
 		DrawTitle("KB Player v0.0", 0).
-		AppendLine("Sample rate: %d\tDuration: %f\tMode: %s", cfg.Audio.SampleRate, cfg.Audio.Duration, cfg.Output.Mode).
-		AppendLine("Quit: %v, Play: %v", cfg.Keymap.Quit, cfg.Keymap.Play)
+		WriteLine("Sample rate: %d\tDuration: %f\tMode: %s", cfg.Audio.SampleRate, cfg.Audio.Duration, cfg.Output.Mode).
+		WriteLine("Quit: %v, Play: %v", cfg.Keymap.Quit, cfg.Keymap.Play)
 	main := tui.NewRegion(1, title.Y+title.Height, width, 16).
 		DrawBorder(tui.ClrCyan).
 		DrawTitle("Main", 0)

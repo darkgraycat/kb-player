@@ -15,25 +15,21 @@ func NewRegion(x, y, w, h int) *Region {
 	}
 }
 
-func (r *Region) AppendLine(line string, a ...any) *Region {
-	if r.cy >= r.Height-2 {
-		return r
-	}
-	Move(r.X+1, r.Y+1+r.cy)
+func (r *Region) Write(line string, a ...any) *Region {
+	r.Focus()
 	n, _ := fmt.Printf(line, a...)
-	r.cx = n
-	r.cy++
+	r.cx += n
 	return r
 }
 
-func (r *Region) ReplaceLines(lines ...string) {
-	r.Clear()
-	for i, line := range lines {
-		if i >= r.Height {
-			break
-		}
-		r.AppendLine("%s", line)
+func (r *Region) WriteLine(line string, a ...any) *Region {
+	if r.cy >= r.Height-2 {
+		return r
 	}
+	r.Write(line, a...)
+	r.cx = 0
+	r.cy++
+	return r
 }
 
 func (r *Region) Clear() *Region {
@@ -57,7 +53,13 @@ func (r *Region) DrawTitle(title string, color int) *Region {
 	return r
 }
 
-func (r *Region) MoveInside() *Region {
-	Move(r.X+1, r.Y+1)
+func (r *Region) Focus() *Region {
+	Move(r.X+r.cx+1, r.Y+r.cy+1)
 	return r
 }
+
+func (r *Region) Move(x, y int) *Region {
+	r.cx, r.cy = x, y
+	return r.Focus()
+}
+
