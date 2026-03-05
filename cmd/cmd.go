@@ -28,9 +28,8 @@ func Execute(cfg *Config) error {
 		ctx := context.Background()
 		var stopAudioLoop context.CancelFunc
 
-		// tui
-		mode := ModeNormal
-		_, _, status := setupUiInterface(cfg, 80)
+		// ui
+		ui := SetupTui(cfg, 80)
 
 		for {
 			ch, err := tui.ReadBuf(os.Stdin, buf)
@@ -48,13 +47,13 @@ func Execute(cfg *Config) error {
 						playCtx, cancel := context.WithCancel(ctx)
 						stopAudioLoop = cancel
 						go audioLoop(playCtx, output, wavChan)
-						mode = ModeRecord
+						ui.mode = ModeRecord
 					} else {
 						stopAudioLoop()
 						stopAudioLoop = nil
-						mode = ModeNormal
+						ui.mode = ModeNormal
 					}
-					status.DrawTitle(mode.String(), 0)
+					ui.footer.DrawTitle(ui.mode.String(), 0)
 				}
 			}
 
@@ -62,6 +61,7 @@ func Execute(cfg *Config) error {
 			if stopAudioLoop != nil {
 				if wav, ok := wavMap[ch]; ok {
 					wavChan <- wav
+					ui.body.Write("%c", ch)
 				}
 			}
 
@@ -100,24 +100,3 @@ func setupCommandMap(cfg *Config) map[byte]Command {
 		byte(cfg.Keymap.Play): CommandPlay,
 	}
 }
-
-func setupUiInterface(cfg *Config, width int) (*tui.Region, *tui.Region, *tui.Region) {
-	tui.Clear()
-	title := tui.NewRegion(1, 1, width, 4).
-		DrawBorder(tui.ClrRed).
-		DrawTitle("KB Player v0.0", 0).
-		WriteLine("Sample rate: %d\tDuration: %f\tMode: %s", cfg.Audio.SampleRate, cfg.Audio.Duration, cfg.Output.Mode).
-		WriteLine("Quit: %v, Play: %v", cfg.Keymap.Quit, cfg.Keymap.Play)
-	main := tui.NewRegion(1, title.Y+title.Height, width, 16).
-		DrawBorder(tui.ClrCyan).
-		DrawTitle("Main", 0)
-	status := tui.NewRegion(1, main.Y+main.Height, width, 3).
-		DrawBorder(tui.ClrGreen).
-		DrawTitle(ModeNormal.String(), 0)
-	tui.Move(0, 0)
-	return title, main, status
-}
-
-func updateUiTitle(r *tui.Region)  {}
-func updateUiMain(r *tui.Region)   {}
-func updateUiStatus(r *tui.Region) {}
