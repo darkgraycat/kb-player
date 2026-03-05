@@ -15,6 +15,16 @@ func NewRegion(x, y, w, h int) *Region {
 	}
 }
 
+// Returns x y width height
+func (r *Region) GetDimensions() (int, int, int, int) {
+	return r.X, r.Y, r.Width, r.Height
+}
+
+// Returns cursor x y
+func (r *Region) GetCursor() (int, int) {
+	return r.cx, r.cy
+}
+
 func (r *Region) Write(line string, a ...any) *Region {
 	r.Focus()
 	n, _ := fmt.Printf(line, a...)
@@ -62,4 +72,3 @@ func (r *Region) Move(x, y int) *Region {
 	r.cx, r.cy = x, y
 	return r.Focus()
 }
-

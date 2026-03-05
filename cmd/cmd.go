@@ -29,7 +29,7 @@ func Execute(cfg *Config) error {
 		var stopAudioLoop context.CancelFunc
 
 		// ui
-		ui := SetupTui(cfg, 80)
+		ui := InitTui(cfg, 80)
 
 		for {
 			ch, err := tui.ReadBuf(os.Stdin, buf)
@@ -47,13 +47,12 @@ func Execute(cfg *Config) error {
 						playCtx, cancel := context.WithCancel(ctx)
 						stopAudioLoop = cancel
 						go audioLoop(playCtx, output, wavChan)
-						ui.mode = ModeRecord
+						ui.ChangeMode(ModeRecord)
 					} else {
 						stopAudioLoop()
 						stopAudioLoop = nil
-						ui.mode = ModeNormal
+						ui.ChangeMode(ModeNormal)
 					}
-					ui.footer.DrawTitle(ui.mode.String(), 0)
 				}
 			}
 
@@ -61,7 +60,7 @@ func Execute(cfg *Config) error {
 			if stopAudioLoop != nil {
 				if wav, ok := wavMap[ch]; ok {
 					wavChan <- wav
-					ui.body.Write("%c", ch)
+					ui.RecordPressedChar(ch)
 				}
 			}
 
