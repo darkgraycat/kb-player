@@ -9,13 +9,6 @@ import (
 var defaultConfigPath = "config.toml"
 
 func main() {
-	// NOTE: just an example to exit gracefully on panic
-	defer func() {
-		if recover() != nil {
-			fmt.Println("Exit")
-		}
-	}()
-
 	configPath := defaultConfigPath
 
 	args := os.Args
@@ -31,6 +24,7 @@ func main() {
 	}
 
 	err = cmd.Execute(cfg)
+	// err = cmd.TestExecute(cfg)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error during execution")
 		fmt.Fprintln(os.Stderr, err)

@@ -6,7 +6,7 @@ duration = 0.33		 # in seconds
 [output]
 mode = "file"		 # file or stream(not implemented yet)
 command = "afplay"   # default: afplay for file mode
-args = ["-v", "0.2"] # volume to 0.2
+args = ["-v", "0.3"] # volume to 0.3
 
 [notes]
 # octave 3

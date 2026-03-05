@@ -5,49 +5,70 @@ import "fmt"
 type Region struct {
 	X, Y          int
 	Width, Height int
-	currentLine   int
+	cx, cy        int
 }
 
 func NewRegion(x, y, w, h int) *Region {
 	return &Region{
 		X: x, Y: y,
 		Width: w, Height: h,
-		currentLine: y + 1,
 	}
 }
 
-func (r *Region) AddContent(lines ...string) {
-	for i, line := range lines {
-		if i >= r.Height {
-			break
-		}
-		Move(r.X+1, r.currentLine)
-		r.currentLine++
-		fmt.Print(line)
-	}
+// Returns x y width height
+func (r *Region) GetDimensions() (int, int, int, int) {
+	return r.X, r.Y, r.Width, r.Height
 }
 
-func (r *Region) ClearContent() {
+// Returns cursor x y
+func (r *Region) GetCursor() (int, int) {
+	return r.cx, r.cy
+}
+
+func (r *Region) Write(line string, a ...any) *Region {
+	r.Focus()
+	n, _ := fmt.Printf(line, a...)
+	r.cx += n
+	return r
+}
+
+func (r *Region) WriteLine(line string, a ...any) *Region {
+	if r.cy >= r.Height-2 {
+		return r
+	}
+	r.Write(line, a...)
+	r.cx = 0
+	r.cy++
+	return r
+}
+
+func (r *Region) Clear() *Region {
 	ClearRect(r.X+1, r.Y+1, r.Width-2, r.Height-2)
-	r.currentLine = r.Y + 1
+	r.cx, r.cy = 0, 0
+	return r
 }
 
 func (r *Region) DrawBorder(color int) *Region {
-	WithColor(color)
+	SetColor(color)
 	DrawBorder(r.X, r.Y, r.Width, r.Height)
-	WithColor(ClrReset)
+	SetColor(ClrReset)
 	return r
 }
 
 func (r *Region) DrawTitle(title string, color int) *Region {
 	Move(r.X+2, r.Y)
-	WithColor(color)
+	SetColor(color)
 	fmt.Printf("[%s]", title)
-	WithColor(ClrReset)
+	SetColor(ClrReset)
 	return r
 }
 
-func (r *Region) MoveInside() *Region {
-	Move(r.X+1, r.Y+1)
+func (r *Region) Focus() *Region {
+	Move(r.X+r.cx+1, r.Y+r.cy+1)
 	return r
+}
+
+func (r *Region) Move(x, y int) *Region {
+	r.cx, r.cy = x, y
+	return r.Focus()
 }

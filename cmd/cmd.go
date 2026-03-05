@@ -23,16 +23,19 @@ func Execute(cfg *Config) error {
 	wavMap := setupWavMap(cfg)
 
 	tui.WithRaw(int(os.Stdin.Fd()), func() (any, error) {
+		// controls
 		buf := make([]byte, 1)
 		ctx := context.Background()
 		var stopAudioLoop context.CancelFunc
 
-		tui.Render()
+		// ui
+		ui := InitTui(cfg, 80)
+
 		for {
-			if _, err := os.Stdin.Read(buf); err != nil {
+			ch, err := tui.ReadBuf(os.Stdin, buf)
+			if err != nil {
 				return nil, err
 			}
-			ch := buf[0]
 
 			// handle commands
 			if cmd, ok := cmdMap[ch]; ok {
@@ -44,9 +47,11 @@ func Execute(cfg *Config) error {
 						playCtx, cancel := context.WithCancel(ctx)
 						stopAudioLoop = cancel
 						go audioLoop(playCtx, output, wavChan)
+						ui.ChangeMode(ModeRecord)
 					} else {
 						stopAudioLoop()
 						stopAudioLoop = nil
+						ui.ChangeMode(ModeNormal)
 					}
 				}
 			}
@@ -55,12 +60,15 @@ func Execute(cfg *Config) error {
 			if stopAudioLoop != nil {
 				if wav, ok := wavMap[ch]; ok {
 					wavChan <- wav
+					ui.RecordPressedChar(ch)
 				}
 			}
+
+			tui.Move(0, 0) // reset cursor
 		}
 	})
 
-	tui.ClearScreen()
+	tui.Clear()
 	return nil
 }
 
@@ -79,7 +87,6 @@ func setupWavMap(cfg *Config) map[byte]*audio.WAV {
 	notes := make(map[byte]*audio.WAV, len(cfg.Notes))
 	for key, note := range cfg.Notes {
 		w := audio.NewWAV(cfg.Audio.SampleRate, cfg.Audio.Channels)
-		// w.AddTone(audio.NoteFreq(note), cfg.Audio.Duration)
 		w.AddTone(note.Freq(), cfg.Audio.Duration)
 		notes[key[0]] = w
 	}
